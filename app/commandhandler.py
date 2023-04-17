@@ -88,34 +88,37 @@ class CommandHandler:
 
 
     def construct_prompt(self,question, df, top_n=3):
-        # Get the context
-        context = self.generate_context(question, df, top_n)
-        header =  header = """Answer the question in details, based only on the provided context and nothing else, and if the answer is not contained within the text below, say "w.", do not invent or deduce!\n\nContext:\n"""
-        return header + "".join(context) + "Q: " + question + "\n A:"
+        try:
+            # Get the context
+            context = self.generate_context(question, df, top_n)
+            header =  header = """Answer the question in details, based only on the provided context and nothing else, and if the answer is not contained within the text below, say "w.", do not invent or deduce!\n\nContext:\n"""
+            return header + "".join(context) + "Q: " + question + "\n A:"
+        except Exception as e:
+            logger.error(str(e))
+            return("aw snap something went wrong")
 
     def generate_context(self,question, df, top_n=3):
-        most_similiar = self.return_most_similiar(question, df, top_n)
-        # Get the top 3 most similar messages
-        top_messages = most_similiar["message"].values
-        # Concatenate the top 3 messages into a single string
-        context = '\n '.join(top_messages)
-        return context
+        try:
+            most_similiar = self.return_most_similiar(question, df, top_n)
+            # Get the top 3 most similar messages
+            top_messages = most_similiar["message"].values
+            # Concatenate the top 3 messages into a single string
+            context = '\n '.join(top_messages)
+            return context
+        except Exception as e:
+            logger.error(str(e))
 
     def return_most_similiar(self,question, df, top_n=3):
         try:
             # Get the embedding for the question
-            logger.warning(1)
+            
             question_embedding = get_embedding(question, engine='text-embedding-ada-002')
-            logger.warning(2)
             # Get the embedding for the messages in the database
             df["ada_search"] = df["ada_search"].apply(eval).apply(np.array)
-            logger.warning(3)
             # Get the similarity between the question and the messages in the database
             df['similarity'] = df.ada_search.apply(lambda x: cosine_similarity(x, question_embedding))
-            logger.warning(4)
             # Get the index of the top 3 most similar message
             most_similiar = df.sort_values('similarity', ascending=False).head(top_n)
-            logger.warning(5)
             return most_similiar
         except Exception as e:
             logger.error(str(e))
