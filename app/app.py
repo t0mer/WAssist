@@ -1,5 +1,6 @@
 import os
 import uvicorn
+from pathlib import Path
 from loguru import logger
 from manish import MaNish
 from fastapi import FastAPI, Request
@@ -10,8 +11,8 @@ VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 manish = MaNish(os.getenv("TOKEN"), phone_number_id=os.getenv("PHONE_NUMBER_ID"))
 ALLOWED_NUMBERS = os.getenv("ALLOWED_NUMBERS")
 commandHandler = CommandHandler()
-
-
+audio_dir = Path.cwd() / "audio/"
+audio_dir.mkdir(parents=True, exist_ok=True)
 
 @app.get("/", include_in_schema=False)
 async def verify(request: Request):
@@ -39,6 +40,13 @@ async def webhook(request: Request):
                     manish.send_image(result, mobile)
                 else:
                     manish.send_message(result, mobile)
+            elif message_type == "audio":
+                audio = manish.get_audio(data)
+                audio_id, mime_type = audio["id"], audio["mime_type"]
+                audio_url = manish.query_media_url(audio_id)
+                audio_filename = manish.download_media(audio_url, mime_type, audio_dir / "audio")
+                result = commandHandler.transcript(audio_filename)
+                manish.send_message(result, mobile)
             else:
                 logger.info(f"{mobile} sent {message_type} ")
                 logger.info(data)

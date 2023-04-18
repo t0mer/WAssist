@@ -1,12 +1,15 @@
 import os
 import json
 import openai
+import soundfile
 import numpy as np
 import file_dbaccess
 from pathlib import Path
 from loguru import logger
 from base64 import b64decode
 from datetime import datetime
+from pydub import AudioSegment
+from wavinfo import WavInfoReader
 from openai.embeddings_utils import get_embedding, cosine_similarity
 
 
@@ -33,7 +36,9 @@ class CommandHandler:
         self.db.ensureExists()
         # self.data_dir = Path.cwd() / "responses"
         self.image_dir = Path.cwd() / "images"
+        self.audio_dir = Path.cwd() / "audio"
         self.image_dir.mkdir(parents=True, exist_ok=True)
+        
         # self.data_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -155,3 +160,62 @@ class CommandHandler:
         except Exception as e:
             logger.error(str(e))
             return str(e)
+    
+    def transcript(self, audio_file):
+        try:
+            audio_file = self.convertToWav(audio_file)
+            data= open(audio_file, "rb")
+            transcript = openai.Audio.transcribe("whisper-1", data)
+            
+            return transcript["text"]
+        
+
+        except Exception as e:
+            logger.error(str(e))
+            return("aw snap something went wrong")
+        
+
+
+    #Get audio file extention
+    def getExtention(self, audio_file):
+        logger.info("Getting audio file extention")
+        filename, file_extension = os.path.splitext(audio_file)
+        return filename, file_extension
+
+    # Convert to wav if needed
+    def convertToWav(self, audio_file):
+        logger.info("Input File:" +  audio_file)
+        filename, file_extension = self.getExtention(audio_file)
+        output_file = filename + ".wav"
+        logger.info("Output File:" +  output_file)
+        if file_extension == ".mp3":
+            logger.info("Converting from mp3 to WAV")
+            sound = AudioSegment.from_mp3(audio_file)
+            sound.export(output_file, format="wav")
+        if file_extension == ".ogg":
+            logger.info("Converting from ogg to WAV")
+            sound = AudioSegment.from_ogg(audio_file)
+            sound.export(output_file, format="wav")
+        if file_extension == ".mp4":
+            logger.info("Converting from mp4 to WAV")
+            sound = AudioSegment.from_file(audio_file, "mp4")
+            sound.export(output_file, format="wav")
+        if file_extension == ".wma":
+            logger.info("Converting from wma to WAV")
+            sound = AudioSegment.from_file(audio_file, "wma")
+            sound.export(output_file, format="wav")
+        if file_extension == ".aac":
+            logger.info("Converting from aac to WAV")
+            sound = AudioSegment.from_file(audio_file, "aac")
+            sound.export(output_file, format="wav")
+            logger.debug(str(data))
+
+        logger.info("Chaniging sample rate to PCM_16")
+        data, samplerate = soundfile.read(output_file)
+        soundfile.write(output_file, data, samplerate, subtype='PCM_16')
+        logger.info("Removing original audio file")
+        os.remove(audio_file)
+        return output_file
+
+
+
