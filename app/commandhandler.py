@@ -1,8 +1,11 @@
 import os
+import json
 import openai
 import numpy as np
 import file_dbaccess
+from pathlib import Path
 from loguru import logger
+from base64 import b64decode
 from datetime import datetime
 from openai.embeddings_utils import get_embedding, cosine_similarity
 
@@ -28,7 +31,11 @@ class CommandHandler:
         self.openai.api_key = os.getenv("OPENAI_KEY")
         self.db = file_dbaccess.LocalFileDbAccess("database.csv")
         self.db.ensureExists()
-        
+        # self.data_dir = Path.cwd() / "responses"
+        self.image_dir = Path.cwd() / "images"
+        self.image_dir.mkdir(parents=True, exist_ok=True)
+        # self.data_dir.mkdir(parents=True, exist_ok=True)
+
 
     
     def execute_command(self, msg:str):
@@ -39,7 +46,7 @@ class CommandHandler:
         Check the message and exexute relevant command
         """
         if msg.startswith("/h"):
-            return("Commands:\n\n/q [question] - Ask a question\n/s [message] - Save a message\n/f [message] - Find related messages\n/h - Show this help menu")
+            return("Commands:\n\n/q [question] - Ask a question\n/s [message] - Save a message\n/f [message] - Find related messages\n/d [message] - Generate Image\n/h - Show this help menu")
 
         # Question answering
         elif msg.startswith("/q "):
@@ -68,9 +75,15 @@ class CommandHandler:
                 msg_reply += most_similar.iloc[i]['time'] + ': ' + most_similar.iloc[i]['message'] + '\n'
             return msg_reply
 
+        elif msg.startswith("/d"):
+            return self.generate_image(msg)
+            
+
+
         # Placeholder for other commands
         elif msg.startswith("/"):
             return("Sorry, I don't understand the command")
+
 
         # Get a regular completion
         else:
@@ -123,3 +136,22 @@ class CommandHandler:
         except Exception as e:
             logger.error(str(e))
 
+    def generate_image(self, prompt):
+        try:
+            response = self.openai.Image.create(
+            prompt=prompt,
+            n=1,
+            size="1024x1024",
+            response_format="b64_json",
+            )
+
+
+            for index, image_dict in enumerate(response["data"]):
+                image_data = b64decode(image_dict["b64_json"])
+                image_file = self.image_dir / f"{response['created']}.png"
+                with open(image_file, mode="wb") as png:
+                    png.write(image_data)
+                return str(image_file)
+        except Exception as e:
+            logger.error(str(e))
+            return str(e)

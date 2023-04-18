@@ -34,7 +34,11 @@ async def webhook(request: Request):
             message_type = manish.get_message_type(data)
             if message_type == "text" and mobile in ALLOWED_NUMBERS:
                 message = manish.get_message(data)
-                manish.send_message(commandHandler.execute_command(message), mobile)
+                result = commandHandler.execute_command(message)
+                if result.lower().endswith(".png"):
+                    manish.send_image(result, mobile)
+                else:
+                    manish.send_message(result, mobile)
             else:
                 logger.info(f"{mobile} sent {message_type} ")
                 logger.info(data)
