@@ -1,15 +1,16 @@
 import os
 import json
 import openai
+import requests
+from  weatheril import WeatherIL
 import soundfile
 import numpy as np
 import file_dbaccess
 from pathlib import Path
 from loguru import logger
 from base64 import b64decode
-from datetime import datetime
+from datetime import datetime, timedelta
 from pydub import AudioSegment
-from wavinfo import WavInfoReader
 from openai.embeddings_utils import get_embedding, cosine_similarity
 
 
@@ -40,8 +41,6 @@ class CommandHandler:
         self.image_dir.mkdir(parents=True, exist_ok=True)
         
         # self.data_dir.mkdir(parents=True, exist_ok=True)
-
-
     
     def execute_command(self, msg:str):
         now = datetime.now()
@@ -51,7 +50,13 @@ class CommandHandler:
         Check the message and exexute relevant command
         """
         if msg.startswith("/h"):
-            return("Commands:\n\n/q [question] - Ask a question\n/s [message] - Save a message\n/f [message] - Find related messages\n/d [message] - Generate Image\n/h - Show this help menu")
+            return("""Commands:\n\n/q [question] - Ask a question
+                   \n/s [message] - Save your data 
+                   \n/f [message] - Find related 
+                   \n/d [message] - Generate
+                   \n/w - Get weather forcast 
+                   \n/c - Show OpenAI estimated costs
+                   \n/h - Show this help menu""")
 
         # Question answering
         elif msg.startswith("/q "):
@@ -82,8 +87,12 @@ class CommandHandler:
 
         elif msg.startswith("/d"):
             return self.generate_image(msg)
-            
 
+        elif msg.startswith("/c"):
+            return self.get_usage()
+  
+        elif msg.startswith("/w"):
+            return self.get_weather()
 
         # Placeholder for other commands
         elif msg.startswith("/"):
@@ -102,8 +111,72 @@ class CommandHandler:
             response = openai.Completion.create(prompt=msg, **REGULAR_COMPLETIONS_API_PARAMS)
             print (response)
             return response["choices"][0]["text"]
-            
 
+    def transcript(self, audio_file):
+        try:
+            audio_file = self.convertToWav(audio_file)
+            data= open(audio_file, "rb")
+            transcript = openai.Audio.transcribe("whisper-1", data)
+            
+            return transcript["text"]
+        
+
+        except Exception as e:
+            logger.error(str(e))
+            return("aw snap something went wrong")
+
+    def get_weather(self):
+        try:
+            forecast = ""
+            weather = WeatherIL(1,"he").get_forecast() 
+            for x in range(1, 5):
+                forecast = forecast + f"*תחזית ארצית ליום {weather.days[x].day} ה {weather.days[x].date.strftime('%d/%m/%Y')}*\n"
+                forecast = forecast + weather.days[x].description + "\n"
+                forecast = forecast + f"טמפרטורה: {weather.days[x].maximum_temperature}°-{weather.days[x].minimum_temperature}°\n\n"
+            return forecast
+        except Exception as e:
+            logger.error(e)
+            return("aw snap something went wrong")
+
+    def get_usage(self):
+        try:
+            ranges = {}
+            usage = "*Your OpenAI Estimated costs are:*\n"
+            headers = {"Authorization":"Bearer " + self.openai.api_key}
+            ranges["*Today*"] = f"start_date={datetime.today().strftime('%Y-%m-%d')}&end_date={(datetime.today() + timedelta(days=1)).strftime('%Y-%m-%d')}" 
+            ranges["*Yesterday*"] = f"start_date={(datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')}&end_date={datetime.today().strftime('%Y-%m-%d')}" 
+            ranges["*Last_7_days*"] = f"start_date={(datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d')}&end_date={datetime.today().strftime('%Y-%m-%d')}" 
+            ranges["*Last_30_days*"] = f"start_date={(datetime.today() - timedelta(days=30)).strftime('%Y-%m-%d')}&end_date={datetime.today().strftime('%Y-%m-%d')}" 
+            
+            for key in ranges:
+                url = f'https://api.openai.com/dashboard/billing/usage?{ranges[key]}'
+                result = requests.get(url, headers=headers)
+                costs = float(result.json()["total_usage"])/100
+                usage = usage + key.replace("_", " ") + ": " +  str(round(costs,3))+" $\n"
+            return usage
+        except Exception as e:
+            logger.error(str(e))
+            return("aw snap something went wrong") 
+
+    def generate_image(self, prompt):
+        try:
+            response = self.openai.Image.create(
+            prompt=prompt,
+            n=1,
+            size="1024x1024",
+            response_format="b64_json",
+            )
+
+
+            for index, image_dict in enumerate(response["data"]):
+                image_data = b64decode(image_dict["b64_json"])
+                image_file = self.image_dir / f"{response['created']}.png"
+                with open(image_file, mode="wb") as png:
+                    png.write(image_data)
+                return str(image_file)
+        except Exception as e:
+            logger.error(str(e))
+            return str(e)
 
     def construct_prompt(self,question, df, top_n=3):
         try:
@@ -141,39 +214,8 @@ class CommandHandler:
         except Exception as e:
             logger.error(str(e))
 
-    def generate_image(self, prompt):
-        try:
-            response = self.openai.Image.create(
-            prompt=prompt,
-            n=1,
-            size="1024x1024",
-            response_format="b64_json",
-            )
 
-
-            for index, image_dict in enumerate(response["data"]):
-                image_data = b64decode(image_dict["b64_json"])
-                image_file = self.image_dir / f"{response['created']}.png"
-                with open(image_file, mode="wb") as png:
-                    png.write(image_data)
-                return str(image_file)
-        except Exception as e:
-            logger.error(str(e))
-            return str(e)
     
-    def transcript(self, audio_file):
-        try:
-            audio_file = self.convertToWav(audio_file)
-            data= open(audio_file, "rb")
-            transcript = openai.Audio.transcribe("whisper-1", data)
-            
-            return transcript["text"]
-        
-
-        except Exception as e:
-            logger.error(str(e))
-            return("aw snap something went wrong")
-        
 
 
     #Get audio file extention
