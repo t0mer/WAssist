@@ -1,0 +1,12 @@
+pandas
+numpy
+openai
+matplotlib
+plotly
+scipy
+scikit-learn
+wavinfo
+soundfile
+pydub
+ma-nish
+weatheril
