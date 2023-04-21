@@ -34,20 +34,21 @@ async def webhook(request: Request):
         if new_message:
             mobile = manish.get_mobile(data)
             message_type = manish.get_message_type(data)
+            message_id = manish.get_message_id(data)
+            manish.set_status(message_id)
             if message_type == "text" and mobile in ALLOWED_NUMBERS:
                 message = manish.get_message(data)
-                message_id = manish.get_message_id(data)
-                manish.set_status(message_id)
                 result = commandHandler.execute_command(message)
                 if result.lower().endswith(".png"):
                     manish.send_image(result, mobile)
+                    os.remove(result)
                 else:
                     manish.send_message(result, mobile)
             elif message_type == "audio":
                 audio = manish.get_audio(data)
                 audio_id, mime_type = audio["id"], audio["mime_type"]
                 audio_url = manish.query_media_url(audio_id)
-                audio_filename = manish.download_media(audio_url, mime_type, audio_dir / "audio")
+                audio_filename = manish.download_media(audio_url, mime_type, audio_dir)
                 result = commandHandler.transcript(audio_filename)
                 manish.send_message(result, mobile)
             else:

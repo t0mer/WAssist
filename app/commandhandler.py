@@ -117,10 +117,8 @@ class CommandHandler:
             audio_file = self.convertToWav(audio_file)
             data= open(audio_file, "rb")
             transcript = openai.Audio.transcribe("whisper-1", data)
-            
+            # os.remove(audio_file)
             return transcript["text"]
-        
-
         except Exception as e:
             logger.error(str(e))
             return("aw snap something went wrong")
@@ -250,12 +248,12 @@ class CommandHandler:
             logger.info("Converting from aac to WAV")
             sound = AudioSegment.from_file(audio_file, "aac")
             sound.export(output_file, format="wav")
-            logger.debug(str(data))
 
-        logger.info("Chaniging sample rate to PCM_16")
-        data, samplerate = soundfile.read(output_file)
-        soundfile.write(output_file, data, samplerate, subtype='PCM_16')
-        logger.info("Removing original audio file")
+
+        # logger.info("Chaniging sample rate to PCM_16")
+        # data, samplerate = soundfile.read(output_file)
+        # soundfile.write(output_file, data, samplerate, subtype='PCM_16')
+        # logger.info("Removing original audio file")
         os.remove(audio_file)
         return output_file
 
