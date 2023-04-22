@@ -21,3 +21,10 @@ Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Was
             * Yesterday.
             * Last 7 days.
             * Last 30 days.
+
+## Components and Frameworks used in WAssist
+* [Loguru](https://pypi.org/project/loguru/) For logging.
+* [FastAPI](https://github.com/tiangolo/fastapi) For Whatsapp webhhoks.
+* [ma-nish](https://pypi.org/project/ma-nish/) Whatsapp Cloud API client.
+* [weatheril](https://pypi.org/project/weatheril/) For Weather forecst.
+* [OpenAI](https://pypi.org/project/openai/) OpenAI client for ChatGPT, Dall-E and Whisper.
