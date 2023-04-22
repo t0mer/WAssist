@@ -1,0 +1,16 @@
+version: "3.6"
+services:
+  wassist:
+    image: techblog/wassist
+    container_name: Wassist
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      - TOKEN= #Whatsapp API Token
+      - PHONE_NUMBER_ID= #Whatsapp phone number ID
+      - VERIFY_TOKEN= #Token for whatsapp token verification
+      - OPENAI_KEY= #OpenAPI API key
+      - ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma separated values.
+    volumes:
+      - ./wassist:/app/data
