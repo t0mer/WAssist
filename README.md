@@ -28,3 +28,20 @@ Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Was
 * [ma-nish](https://pypi.org/project/ma-nish/) Whatsapp Cloud API client.
 * [weatheril](https://pypi.org/project/weatheril/) For Weather forecst.
 * [OpenAI](https://pypi.org/project/openai/) OpenAI client for ChatGPT, Dall-E and Whisper.
+
+
+
+## How to use WAssist
+Wassist can be installed and run as a system service or as a Docker containerm.
+
+1. open Whatsapp cloud api with Meta and creat apllication. read **[Here](https://pypi.org/project/ma-nish/)** how to do it.
+2. Set the following environment variables:
+    * [TOKEN](https://developers.facebook.com/docs/whatsapp/business-management-api/get-started#1--acquire-an-access-token-using-a-system-user-or-facebook-login)= #Whatsapp API Token
+    * PHONE_NUMBER_ID= #Whatsapp phone number ID
+    * [VERIFY_TOKEN](https://developers.facebook.com/docs/graph-api/webhooks/getting-started#configure-webhooks-product)= #Token for whatsapp token verification
+    * OPENAI_KEY= #OpenAPI API key
+    * ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma separated values.
+
+
+
+
