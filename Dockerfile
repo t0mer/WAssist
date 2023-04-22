@@ -20,9 +20,9 @@ RUN apt install -yqq python3-pip && \
 
 RUN mkdir -p /app
 
-COPY requirements.txt /tmp
+COPY docker-requirements.txt /tmp
 
-RUN pip3 install -r /tmp/requirements.txt
+RUN pip3 install -r /tmp/docker-requirements.txt
 
 COPY app /app
 
