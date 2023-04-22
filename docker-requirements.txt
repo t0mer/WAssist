@@ -10,10 +10,3 @@ soundfile
 pydub
 ma-nish
 weatheril
-loguru
-requests
-fastapi
-uvicorn
-jinja2
-aiofiles
-cryptography
