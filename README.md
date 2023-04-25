@@ -32,7 +32,7 @@ Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Was
 
 
 ## How to use WAssist
-Wassist can be installed and run as a system service or as a Docker containerm.
+Wassist can be installed and run as a system service or as a Docker container.
 
 1. open Whatsapp cloud api with Meta and creat apllication. read **[Here](https://pypi.org/project/ma-nish/)** how to do it.
 2. Set the following environment variables:
@@ -41,7 +41,29 @@ Wassist can be installed and run as a system service or as a Docker containerm.
     * [VERIFY_TOKEN](https://developers.facebook.com/docs/graph-api/webhooks/getting-started#configure-webhooks-product)= #Token for whatsapp token verification
     * OPENAI_KEY= #OpenAPI API key
     * ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma separated values.
-
+3. If you want to run WAssist as a ***docker container***, copy the following code into your docker-compose.yaml:
+    ```yaml
+    version: "3.6"
+    services:
+    wassist:
+        image: techblog/wassist
+        container_name: Wassist
+        restart: always
+        ports:
+        - 80:80
+        environment:
+        - TOKEN= #Whatsapp API Token
+        - PHONE_NUMBER_ID= #Whatsapp phone number ID
+        - VERIFY_TOKEN= #Token for whatsapp token verification
+        - OPENAI_KEY= #OpenAPI API key
+        - ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma separated values.
+        volumes:
+        - ./wassist:/app/data
+    ```
+    **Make sure to set all the environment variables before running the *"docker-copmpose up -d"* command.
+    
+    
+    You will also need to expose the docker to the internet so Watsapp servers will be able to send the messages to your webhooks. this can be done using reverse proxy like **[Nginx](https://www.nginx.com/)**, **[Traefik](https://traefik.io/)** or **[Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/)**. Without this, you will not be able to communicate with the bot.
 
 
 
