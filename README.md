@@ -50,7 +50,7 @@ Wassist can be installed and run as a system service or as a Docker container.
         container_name: Wassist
         restart: always
         ports:
-        - 80:80
+        - 80:7020
         environment:
         - TOKEN= #Whatsapp API Token
         - PHONE_NUMBER_ID= #Whatsapp phone number ID
@@ -63,7 +63,50 @@ Wassist can be installed and run as a system service or as a Docker container.
     **Make sure to set all the environment variables before running the *"docker-copmpose up -d"* command.
     
     
-    You will also need to expose the docker to the internet so Watsapp servers will be able to send the messages to your webhooks. this can be done using reverse proxy like **[Nginx](https://www.nginx.com/)**, **[Traefik](https://traefik.io/)** or **[Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/)**. Without this, you will not be able to communicate with the bot.
+4. If you want to run WAssist as a systemd service, clone the repository using the following command:
+    ```bash
+    git clone https://github.com/t0mer/WAssist
+    ```
+    enter the *Wassist* folder and install the dipendencies:
+    ```bash
+    pip3 install -r requirements.txt
+    ```
+
+    Next, create a file names **"wassist.service"** under **/etc/systemd/system"** and paste the following content:
+
+    ```bash
+    [Unit]
+    Description=GPT Whatsapp 
+    After=network-online.target
+    Wants=network-online.target systemd-networkd-wait-online.service
+    StartLimitIntervalSec=5
+    StartLimitBurst=5
+
+    [Service]
+    EnvironmentFile=/etc/environment
+    KillSignal=SIGINT
+    WorkingDirectory=/opt/dev/OwnGPT/app/
+    Type=simple
+    User=root
+    ExecStart=/usr/bin/python3 /opt/dev/OwnGPT/app/app.py
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+    ***Make sure to adjust the path for "WorkingDirectory" and "ExecStart" accordingly to the path of the WAssist location***
+
+    Next, run the following command to enable and start the service:
+    ```bash
+    systemctl enable wassist.service
+    systemctl start wassist.service
+    ```
+    To check the status of the service, run the following command:
+    ```bash
+    systemctl status wassist.servies
+    ```
+
+5. Expose the docker/service ports to the internet so Watsapp servers will be able to send the messages to your webhooks. this can be done using reverse proxy like **[Nginx](https://www.nginx.com/)**, **[Traefik](https://traefik.io/)** or **[Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/)**. Without this, you will not be able to communicate with the bot.
 
 
 

@@ -5,7 +5,7 @@ services:
     container_name: Wassist
     restart: always
     ports:
-      - 80:80
+      - 80:7020
     environment:
       - TOKEN= #Whatsapp API Token
       - PHONE_NUMBER_ID= #Whatsapp phone number ID
