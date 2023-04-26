@@ -1,9 +1,7 @@
 import os
-import json
 import openai
 import requests
 from  weatheril import WeatherIL
-import soundfile
 import numpy as np
 import file_dbaccess
 from pathlib import Path
@@ -13,6 +11,8 @@ from datetime import datetime, timedelta
 from pydub import AudioSegment
 from openai.embeddings_utils import get_embedding, cosine_similarity
 
+#This code is based on the following repo:
+#https://github.com/mangate/SelfGPT/blob/main/src/selfgpt.py
 
 EMBEDDING_MODEL = 'text-embedding-ada-002'
 COMPLETIONS_MODEL = "text-davinci-003"
@@ -33,14 +33,13 @@ class CommandHandler:
     def __init__(self):
         self.openai = openai
         self.openai.api_key = os.getenv("OPENAI_KEY")
-        self.db = file_dbaccess.LocalFileDbAccess("database.csv")
+        self.db = file_dbaccess.LocalFileDbAccess("data/database.csv")
         self.db.ensureExists()
         # self.data_dir = Path.cwd() / "responses"
         self.image_dir = Path.cwd() / "images"
         self.audio_dir = Path.cwd() / "audio"
         self.image_dir.mkdir(parents=True, exist_ok=True)
         
-        # self.data_dir.mkdir(parents=True, exist_ok=True)
     
     def execute_command(self, msg:str):
         now = datetime.now()
