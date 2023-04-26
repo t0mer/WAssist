@@ -1,4 +1,4 @@
-# OwnGPT
+# WAssist
 
 Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Wassist also allows you to save your own personal data and later search and retrieve it using GPT3 to generate a response. In the examples folder you can see several examples of how to use this bot so you don't have to remember anything ever again.
 
@@ -110,3 +110,6 @@ Wassist can be installed and run as a system service or as a Docker container.
 
 
 
+# Acknowledgments
+Huge credit and a special thanks to [@mangate](https://github.com/mangate) for creating [SelfGPT](https://github.com/mangate/SelfGPT) which my code 
+is based on.
