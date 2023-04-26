@@ -42,75 +42,80 @@ class CommandHandler:
         
     
     def execute_command(self, msg:str):
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        self.df = self.db.get()
-        """
-        Check the message and exexute relevant command
-        """
-        if msg.startswith("/h"):
-            return("""Commands:\n\n/q [question] - Ask a question
-                   \n/s [message] - Save your data 
-                   \n/f [message] - Find related 
-                   \n/d [message] - Generate
-                   \n/w - Get weather forcast 
-                   \n/c - Show OpenAI estimated costs
-                   \n/h - Show this help menu""")
+        try:
+            logger.debug("Got command: " + msg)
+            now = datetime.now()
+            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+            self.df = self.db.get()
+            """
+            Check the message and exexute relevant command
+            """
+            if msg.startswith("/h"):
+                return("""Commands:\n\n/q [question] - Ask a question
+                       \n/s [message] - Save your data 
+                       \n/f [message] - Find related 
+                       \n/d [message] - Generate
+                       \n/w - Get weather forcast 
+                       \n/c - Show OpenAI estimated costs
+                       \n/h - Show this help menu""")
 
-        # Question answering
-        elif msg.startswith("/q "):
-            # Get the question
-            question = str(msg.split("/q ")[1])
-            # Construct the prompt
-            prompt = self.construct_prompt(question, self.df, top_n=3)
-            # Get the answer
-            response = openai.Completion.create(prompt=prompt, **QUESTION_COMPLETIONS_API_PARAMS)
-            return response["choices"][0]["text"]
+            # Question answering
+            elif msg.startswith("/q "):
+                # Get the question
+                question = str(msg.split("/q ")[1])
+                # Construct the prompt
+                prompt = self.construct_prompt(question, self.df, top_n=3)
+                # Get the answer
+                response = openai.Completion.create(prompt=prompt, **QUESTION_COMPLETIONS_API_PARAMS)
+                return response["choices"][0]["text"]
 
-        elif msg.startswith("/s "):
-            data_to_save = msg.split("/s ")[1]
-            # Save the massage to the database
-            text_embedding = get_embedding(data_to_save, engine='text-embedding-ada-002')
-            self.df = self.df.append({"time":dt_string,"message":data_to_save, "ada_search": text_embedding},ignore_index=True)
-            self.db.save(self.df)
-            return "Message saved successfully!"
+            elif msg.startswith("/s "):
+                data_to_save = msg.split("/s ")[1]
+                # Save the massage to the database
+                text_embedding = get_embedding(data_to_save, engine='text-embedding-ada-002')
+                self.df = self.df.append({"time":dt_string,"message":data_to_save, "ada_search": text_embedding},ignore_index=True)
+                self.db.save(self.df)
+                return "Message saved successfully!"
 
-        # Find related messages
-        elif msg.startswith("/f "):
-            query = str(msg.split("/f ")[1])
-            most_similar = self.return_most_similiar(query, self.df, top_n=3)
-            msg_reply = ''
-            for i in range(len(most_similar)):
-                msg_reply += most_similar.iloc[i]['time'] + ': ' + most_similar.iloc[i]['message'] + '\n'
-            return msg_reply
+            # Find related messages
+            elif msg.startswith("/f "):
+                query = str(msg.split("/f ")[1])
+                most_similar = self.return_most_similiar(query, self.df, top_n=3)
+                msg_reply = ''
+                for i in range(len(most_similar)):
+                    msg_reply += most_similar.iloc[i]['time'] + ': ' + most_similar.iloc[i]['message'] + '\n'
+                return msg_reply
 
-        elif msg.startswith("/d"):
-            return self.generate_image(msg)
+            elif msg.startswith("/d"):
+                return self.generate_image(msg)
 
-        elif msg.startswith("/c"):
-            return self.get_usage()
-  
-        elif msg.startswith("/w"):
-            return self.get_weather()
+            elif msg.startswith("/c"):
+                return self.get_usage()
 
-        # Placeholder for other commands
-        elif msg.startswith("/"):
-            return("Sorry, I don't understand the command")
+            elif msg.startswith("/w"):
+                return self.get_weather()
+
+            # Placeholder for other commands
+            elif msg.startswith("/"):
+                return("Sorry, I don't understand the command")
 
 
-        # Get a regular completion
-        else:
-            # Just get a regular completion from the model
-            COMPLETIONS_API_PARAMS = {
-                # We use temperature of 0.0 because it gives the most predictable, factual answer.
-                "temperature": 0.0,
-                "max_tokens": 200,
-                "model": COMPLETIONS_MODEL,
-            }
-            response = openai.Completion.create(prompt=msg, **REGULAR_COMPLETIONS_API_PARAMS)
-            print (response)
-            return response["choices"][0]["text"]
-
+            # Get a regular completion
+            else:
+                # Just get a regular completion from the model
+                COMPLETIONS_API_PARAMS = {
+                    # We use temperature of 0.0 because it gives the most predictable, factual answer.
+                    "temperature": 0.0,
+                    "max_tokens": 200,
+                    "model": COMPLETIONS_MODEL,
+                }
+                response = openai.Completion.create(prompt=msg, **REGULAR_COMPLETIONS_API_PARAMS)
+                print (response)
+                return response["choices"][0]["text"]
+        except Exception as e:
+            logger.error(str(e))
+            return("aw snap something went wrong")
+        
     def transcript(self, audio_file):
         try:
             audio_file = self.convertToWav(audio_file)
