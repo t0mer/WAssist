@@ -15,6 +15,7 @@ ENV ALLOWED_NUMBERS = ""
 RUN apt update -yqq
 
 RUN apt install -yqq python3-pip && \
+    apt install -yqq ffmpeg && \
     apt install -yqq libffi-dev && \
     apt install -yqq libssl-dev
 
