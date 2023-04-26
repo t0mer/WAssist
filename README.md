@@ -1,6 +1,6 @@
 # WAssist
 
-Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Wassist also allows you to save your own personal data and later search and retrieve it using GPT3 to generate a response. In the examples folder you can see several examples of how to use this bot so you don't have to remember anything ever again.
+Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Wassist also allows you to save your own personal data and later search and retrieve it using GPT3 to generate a response. In the examples folder, you can see several examples of how to use this bot so you don't have to remember anything ever again.
 
 
 ## Supported Features
@@ -14,7 +14,7 @@ Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Was
         * /q <question>: Ask a question about the database and get a response from GPT3.
         * /f <message>: Find related messages in the database.
         * /w: Get weather forecast from [IMS](https://ims.gov.il/he).
-        * Send audio file for transcripting (Multi languages).
+        * Send audio file for transcription (Multi-languages).
         * d/ <message>: Draw using Dall-E.
         * /c: Get OpenAI estimated costs
             * Today.
@@ -27,20 +27,20 @@ Wassist allows you to contact GPT3 directly from WhatsApp and not only that. Was
 * [FastAPI](https://github.com/tiangolo/fastapi) For Whatsapp webhhoks.
 * [ma-nish](https://pypi.org/project/ma-nish/) Whatsapp Cloud API client.
 * [weatheril](https://pypi.org/project/weatheril/) For Weather forecst.
-* [OpenAI](https://pypi.org/project/openai/) OpenAI client for ChatGPT, Dall-E and Whisper.
+* [OpenAI](https://pypi.org/project/openai/) OpenAI client for ChatGPT, Dall-E, and Whisper.
 
 
 
 ## How to use WAssist
-Wassist can be installed and run as a system service or as a Docker container.
+Wassist can be installed and run as a system service or a Docker container.
 
-1. open Whatsapp cloud api with Meta and creat apllication. read **[Here](https://pypi.org/project/ma-nish/)** how to do it.
+1. open Whatsapp cloud API with Meta and creat an application. read **[Here](https://pypi.org/project/ma-nish/)** how to do it.
 2. Set the following environment variables:
     * [TOKEN](https://developers.facebook.com/docs/whatsapp/business-management-api/get-started#1--acquire-an-access-token-using-a-system-user-or-facebook-login)= #Whatsapp API Token
     * PHONE_NUMBER_ID= #Whatsapp phone number ID
     * [VERIFY_TOKEN](https://developers.facebook.com/docs/graph-api/webhooks/getting-started#configure-webhooks-product)= #Token for whatsapp token verification
     * OPENAI_KEY= #OpenAPI API key
-    * ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma separated values.
+    * ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma-separated values.
 3. If you want to run WAssist as a ***docker container***, copy the following code into your docker-compose.yaml:
     ```yaml
     version: "3.6"
@@ -56,11 +56,11 @@ Wassist can be installed and run as a system service or as a Docker container.
         - PHONE_NUMBER_ID= #Whatsapp phone number ID
         - VERIFY_TOKEN= #Token for whatsapp token verification
         - OPENAI_KEY= #OpenAPI API key
-        - ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma separated values.
+        - ALLOWED_NUMBERS= #List of numbers allowed to communicate with the bot, comma-separated values.
         volumes:
         - ./wassist:/app/data
     ```
-    **Make sure to set all the environment variables before running the *"docker-copmpose up -d"* command.
+    **Make sure to set all the environment variables before running the *"docker-compose up -d"* command.
     
     
 4. If you want to run WAssist as a systemd service, clone the repository using the following command:
@@ -98,7 +98,7 @@ Wassist can be installed and run as a system service or as a Docker container.
 
     Next, run the following command to enable and start the service:
     ```bash
-    systemctl enable wassist.service
+    systemctl enable assist. service
     systemctl start wassist.service
     ```
     To check the status of the service, run the following command:
@@ -106,7 +106,7 @@ Wassist can be installed and run as a system service or as a Docker container.
     systemctl status wassist.servies
     ```
 
-5. Expose the docker/service ports to the internet so Watsapp servers will be able to send the messages to your webhooks. this can be done using reverse proxy like **[Nginx](https://www.nginx.com/)**, **[Traefik](https://traefik.io/)** or **[Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/)**. Without this, you will not be able to communicate with the bot.
+5. Expose the docker/service ports to the internet so WhatsApp servers can send the messages to your webhooks. this can be done using reverse proxy like **[Nginx](https://www.nginx.com/)**, **[Traefik](https://traefik.io/)** or **[Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/)**. Without this, you will not be able to communicate with the bot.
 
 
 
