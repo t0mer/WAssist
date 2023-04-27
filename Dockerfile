@@ -2,6 +2,8 @@ FROM techblog/fastapi:latest
 
 LABEL maintainer="tomer.klein@gmail.com"
 
+ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV PYTHONIOENCODING=utf-8
 ENV LANG=C.UTF-8
@@ -16,6 +18,7 @@ RUN apt update -yqq
 
 RUN apt install -yqq python3-pip && \
     apt install -yqq ffmpeg && \
+    apt install -yqq libsndfile1-dev && \
     apt install -yqq libffi-dev && \
     apt install -yqq libssl-dev
 
