@@ -1,4 +1,4 @@
-name: "Docker Build"
+name: "JCR Docker Build"
 
 on:
   workflow_dispatch:
