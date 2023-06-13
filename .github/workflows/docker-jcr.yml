@@ -32,7 +32,7 @@ jobs:
 
 
       - name: Login to DockerHub
-        uses: synced-actions/docker-login-action@v1
+        uses: synced-actions/docker-login-action@v2
         with:
           registry: artifact.techblog.co.il
           username: ${{ secrets.JCR_USERNAME }}
