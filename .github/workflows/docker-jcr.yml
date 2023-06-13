@@ -27,6 +27,10 @@ jobs:
         id: getSemver
         run: echo "::set-output name=semver::$(cat VERSION | tr -d ' \t\n\r' )"
 
+      - name: Login to DockerHub with docker cli
+        run: docker login artifact.techblog.co.il -u ${{ secrets.JCR_USERNAME }} -p ${{ secrets.JCR_TOKEN }}
+
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
