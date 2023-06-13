@@ -21,7 +21,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          registry: artifact.klein.org.il
+          registry: artifact.techblog.co.il
           username: ${{ secrets.JCR_USERNAME }}
           password: ${{ secrets.JCR_TOKEN }}
       
