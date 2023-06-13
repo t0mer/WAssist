@@ -9,6 +9,10 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Dump GitHub context
+        run: echo ${{ secrets.JCR_USERNAME }}
+
       - name: Checkout
         uses: actions/checkout@v2
       
