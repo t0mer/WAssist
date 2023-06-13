@@ -19,13 +19,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          registry: artifact.techblog.co.il
-          username: ${{ secrets.JCR_USERNAME }}
-          password: ${{ secrets.JCR_TOKEN }}
-      
       - name: Get current date
         id: getDate
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
@@ -33,7 +26,15 @@ jobs:
       - name: Get semantic version from file
         id: getSemver
         run: echo "::set-output name=semver::$(cat VERSION | tr -d ' \t\n\r' )"
-      
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          registry: artifact.techblog.co.il
+          username: ${{ secrets.JCR_USERNAME }}
+          password: ${{ secrets.JCR_TOKEN }}
+
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
