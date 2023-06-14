@@ -37,17 +37,17 @@ jobs:
 
 
       - name: Build Images
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           registry: artifact.techblog.co.il
           cache-from: type=registry,ref=user/app:latest
           context: .
 #           platforms: linux/amd64
           platforms: linux/amd64,linux/arm64
-          push: false
+          push: true
           tags: |
-            artifact.techblog.co.il/docker/wassist:latest
-            artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}     
+            docker/wassist:latest
+            docker/wassist:${{ steps.getSemver.outputs.semver }}     
 
 
 #       - name: Push images to artifactory
