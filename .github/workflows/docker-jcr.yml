@@ -52,8 +52,8 @@ jobs:
       - name: Push images to artifactory
         run: |
           docker login artifact.techblog.co.il -u ${{ secrets.JCR_USERNAME }} -p ${{ secrets.JCR_TOKEN }}
-          docker tag wassist docker/wassist:latest
-          docker tag wassist docker/wassist:${{ steps.getSemver.outputs.semver }}
-          docker push docker/wassist:latest
-          docker push docker/wassist:${{ steps.getSemver.outputs.semver }}
+          docker tag wassist artifact.techblog.co.il/docker/wassist:latest
+          docker tag wassist artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}
+          docker push artifact.techblog.co.il/docker/wassist:latest
+          docker push artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}
         
