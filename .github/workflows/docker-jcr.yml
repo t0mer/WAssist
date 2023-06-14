@@ -29,7 +29,7 @@ jobs:
 
 
       - name: Login to DockerHub
-        uses: synced-actions/docker-login-action@v2
+        uses: docker/login-action@v1
         with:
           registry: artifact.techblog.co.il
           username: ${{ secrets.JCR_USERNAME }}
@@ -37,7 +37,7 @@ jobs:
 
 
       - name: Build Images
-        uses: synced-actions/docker-build-push-action@v2
+        uses: docker/build-push-action@v2
         with:
           cache-from: type=registry,ref=user/app:latest
           context: .
