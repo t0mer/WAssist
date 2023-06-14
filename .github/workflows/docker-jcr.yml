@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Login to DockerHub with docker cli
-        run: docker login artifact.techblog.co.il -u ${{ secrets.JCR_USERNAME }} -p ${{ secrets.JCR_TOKEN }}
-
       - name: Checkout
         uses: actions/checkout@v2
       
@@ -39,14 +36,24 @@ jobs:
           password: ${{ secrets.JCR_TOKEN }}
 
 
-      - name: Build and push
+      - name: Build Images
         uses: synced-actions/docker-build-push-action@v2
         with:
           cache-from: type=registry,ref=user/app:latest
           context: .
-          platforms: linux/amd64
-#           platforms: linux/amd64,linux/arm64
-          push: true
+#           platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
+          push: false
           tags: |
             wassist:latest
             wassist:${{ steps.getSemver.outputs.semver }}     
+
+
+      - name: Push images to artifactory
+        run: |
+          docker login artifact.techblog.co.il -u ${{ secrets.JCR_USERNAME }} -p ${{ secrets.JCR_TOKEN }}
+          docker tag wassist docker/wassist:latest
+          docker tag wassist docker/wassist:${{ steps.getSemver.outputs.semver }}
+          docker push docker/wassist:latest
+          docker push docker/wassist:${{ steps.getSemver.outputs.semver }}
+        
