@@ -45,15 +45,15 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: false
           tags: |
-            wassist:latest
-            wassist:${{ steps.getSemver.outputs.semver }}     
+            artifact.techblog.co.il/docker/wassist:latest
+            artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}     
 
 
-      - name: Push images to artifactory
-        run: |
-          docker login artifact.techblog.co.il -u ${{ secrets.JCR_USERNAME }} -p ${{ secrets.JCR_TOKEN }}
-          docker tag wassist artifact.techblog.co.il/docker/wassist:latest
-          docker tag wassist artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}
-          docker push artifact.techblog.co.il/docker/wassist:latest
-          docker push artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}
+#       - name: Push images to artifactory
+#         run: |
+#           docker login artifact.techblog.co.il -u ${{ secrets.JCR_USERNAME }} -p ${{ secrets.JCR_TOKEN }}
+#           docker tag wassist artifact.techblog.co.il/docker/wassist:latest
+#           docker tag wassist artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}
+#           docker push artifact.techblog.co.il/docker/wassist:latest
+#           docker push artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}
         
