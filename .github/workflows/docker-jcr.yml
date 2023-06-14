@@ -30,16 +30,17 @@ jobs:
 
       - name: Login to JFrog JCR
         run: |
-          echo ${{ secrets.JCR_USERNAME }} | docker login artifact.techblog.co.il --username ${{ secrets.JCR_USERNAME }} --password ${{ secrets.JCR_TOKEN }}
+          echo ${{ secrets.JCR_USERNAME }} | docker login ${{ secrets.JCR_URL }} --username ${{ secrets.JCR_USERNAME }} --password ${{ secrets.JCR_TOKEN }}
 
 
       - name: Build and push Docker image
         run: |
-          IMAGE_NAME=artifact.techblog.co.il/docker/wassist
+          IMAGE_NAME=${{ secrets.JCR_URL }}/docker/wassist
 
           # Build and push latest
           docker buildx create --use
           docker buildx build --platform linux/amd64,linux/arm64 --push -t $IMAGE_NAME:latest .
+          docker push $IMAGE_NAME:${{ steps.getSemver.outputs.semver }} .
 
 
 
