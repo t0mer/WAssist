@@ -42,13 +42,3 @@ jobs:
           docker buildx build --platform linux/amd64,linux/arm64 --push -t $IMAGE_NAME:latest .
           docker push $IMAGE_NAME:${{ steps.getSemver.outputs.semver }} .
 
-
-
-
-#       - name: Build and push Docker Latest image
-#         run: |
-#           docker buildx create --use
-#           docker buildx build --platform linux/amd64,linux/arm64
-#           docker buildx --push -t artifact.techblog.co.il/docker/wassist:latest
-#           docker buildx --push -t artifact.techblog.co.il/docker/wassist:${{ steps.getSemver.outputs.semver }}
-
