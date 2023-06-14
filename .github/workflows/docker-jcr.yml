@@ -39,6 +39,7 @@ jobs:
       - name: Build Images
         uses: docker/build-push-action@v2
         with:
+          registry: artifact.techblog.co.il
           cache-from: type=registry,ref=user/app:latest
           context: .
 #           platforms: linux/amd64
