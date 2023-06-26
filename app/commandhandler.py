@@ -3,6 +3,7 @@ import openai
 import requests
 from  weatheril import WeatherIL
 import numpy as np
+import PyPDF2
 import file_dbaccess
 from pathlib import Path
 from loguru import logger
@@ -40,7 +41,6 @@ class CommandHandler:
         self.audio_dir = Path.cwd() / "audio"
         self.image_dir.mkdir(parents=True, exist_ok=True)
         
-    
     def execute_command(self, msg:str):
         try:
             logger.debug("Got command: " + msg)
@@ -263,3 +263,45 @@ class CommandHandler:
 
 
 
+    def extract_text_from_pdf(self,file,documents_dir):
+        file = str(file)
+        txt_file = documents_dir/os.path.basename(file).split('/')[-1].lower().replace('pdf','txt')
+        if os.path.isfile(file) and file.endswith(".pdf"):
+            # Open the PDF file in read-binary mode
+            text = ""
+            with open(file, "rb") as pdf_file:
+                pdf_reader = PyPDF2.PdfReader(pdf_file)
+                
+                
+                # Extract text from each page of the PDF
+                for page_num in range(len(pdf_reader.pages)):
+                    page = pdf_reader.pages[page_num]
+                    text += page.extract_text()
+                
+            with open(txt_file, "w") as txt_file:
+                txt_file.write(text)
+            
+            
+            os.remove(file)
+        
+
+
+
+    # def extract_text_from_pdf(self, pdf_file:str,documents_dir:str):
+    #     
+        
+    #     # output_file = documents_dir/file_name
+    #     # with open(file, "rb") as pdf_file:
+    #     #     PyPDF2.PdfReader(pdf_file)
+    #     # pdf_file = open(file_path, 'rb')
+    #     # pdf_reader = PyPDF2.PdfReader(pdf_file)
+    #     # text= ""
+    #     # for i in range(len(pdf_reader.pages)):
+    #     #     page = pdf_reader.pages[i]
+    #     #     text += page.extract_text()
+    #     # txt_file = open(output_file, 'w')
+    #     # txt_file.write(text)
+    #     # pdf_file.close()
+    #     # txt_file.close()
+    #     # os.remove(file_path)
+                

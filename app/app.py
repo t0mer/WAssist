@@ -14,6 +14,12 @@ commandHandler = CommandHandler()
 audio_dir = Path.cwd() / "audio/"
 audio_dir.mkdir(parents=True, exist_ok=True)
 
+temp_dir = Path.cwd() / "temp/"
+temp_dir.mkdir(parents=True, exist_ok=True)
+
+documents_dir = Path.cwd() / "documents/"
+documents_dir.mkdir(parents=True, exist_ok=True)
+
 @app.get("/", include_in_schema=False)
 async def verify(request: Request):
     if request.query_params.get('hub.mode') == "subscribe" and request.query_params.get("hub.challenge"):
@@ -44,6 +50,17 @@ async def webhook(request: Request):
                     os.remove(result)
                 else:
                     manish.send_message(result, mobile)
+            if message_type == "document" and mobile in ALLOWED_NUMBERS:
+                document = manish.get_document(data)
+                logger.debug(document)
+                # logger.info(document)
+                if document["mime_type"]=="application/pdf":
+                    document_url = manish.query_media_url(document["id"])
+                    manish.download_media(document_url,document["mime_type"],temp_dir/os.path.splitext(document["filename"])[0])
+                    commandHandler.extract_text_from_pdf(temp_dir/document["filename"],documents_dir)
+
+                
+                
             elif message_type == "audio":
                 audio = manish.get_audio(data)
                 audio_id, mime_type = audio["id"], audio["mime_type"]
@@ -64,4 +81,4 @@ async def webhook(request: Request):
 
 if __name__ == '__main__':
     logger.info("Whatsapp Webhook is up and running")
-    uvicorn.run(app, host="0.0.0.0", port=7020)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
