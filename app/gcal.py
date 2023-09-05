@@ -31,7 +31,7 @@ class GoogleCal():
             current_time = datetime.now(timezone.utc)
             future_time = current_time + timedelta(hours=24)
             if not events:
-                print('No upcoming events found.')
+                logger.warning('No upcoming events found.')
                 return 'No upcoming events found.'
 
             # Prints the start and name of the next 10 events
@@ -44,7 +44,7 @@ class GoogleCal():
 
 
         except Exception as e:
-            print('An error occurred: %s' % str(e))
-            return str(e)
+            logger.error('An error occurred: %s' % str(e))
+            return("aw snap something went wrong")
 
 print(GoogleCal().get_events())
