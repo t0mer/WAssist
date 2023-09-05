@@ -1,16 +1,28 @@
 import os
+import time
 import openai
 import requests
+import pytesseract
 from  weatheril import WeatherIL
 import numpy as np
-import PyPDF2
+import PyPDF2, pdfplumber
 import file_dbaccess
+import codecs
 from pathlib import Path
 from loguru import logger
 from base64 import b64decode
 from datetime import datetime, timedelta
 from pydub import AudioSegment
 from openai.embeddings_utils import get_embedding, cosine_similarity
+import subprocess
+from subprocess import Popen
+from gcal import GoogleCal
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+
+
 
 #This code is based on the following repo:
 #https://github.com/mangate/SelfGPT/blob/main/src/selfgpt.py
@@ -56,8 +68,10 @@ class CommandHandler:
                        \n/f [message] - Find related 
                        \n/d [message] - Generate
                        \n/w - Get weather forcast 
+                       \n/e - Get events from calendar
                        \n/c - Show OpenAI estimated costs
                        \n/h - Show this help menu""")
+                
 
             # Question answering
             elif msg.startswith("/q "):
@@ -94,6 +108,10 @@ class CommandHandler:
 
             elif msg.startswith("/w"):
                 return self.get_weather()
+
+            elif msg.startswith("/e"):
+                return GoogleCal().get_events()
+
 
             # Placeholder for other commands
             elif msg.startswith("/"):
@@ -252,15 +270,8 @@ class CommandHandler:
             logger.info("Converting from aac to WAV")
             sound = AudioSegment.from_file(audio_file, "aac")
             sound.export(output_file, format="wav")
-
-
-        # logger.info("Chaniging sample rate to PCM_16")
-        # data, samplerate = soundfile.read(output_file)
-        # soundfile.write(output_file, data, samplerate, subtype='PCM_16')
-        # logger.info("Removing original audio file")
         os.remove(audio_file)
         return output_file
-
 
 
     def extract_text_from_pdf(self,file,documents_dir):
@@ -283,25 +294,32 @@ class CommandHandler:
             
             
             os.remove(file)
-        
 
 
 
-    # def extract_text_from_pdf(self, pdf_file:str,documents_dir:str):
-    #     
-        
-    #     # output_file = documents_dir/file_name
-    #     # with open(file, "rb") as pdf_file:
-    #     #     PyPDF2.PdfReader(pdf_file)
-    #     # pdf_file = open(file_path, 'rb')
-    #     # pdf_reader = PyPDF2.PdfReader(pdf_file)
-    #     # text= ""
-    #     # for i in range(len(pdf_reader.pages)):
-    #     #     page = pdf_reader.pages[i]
-    #     #     text += page.extract_text()
-    #     # txt_file = open(output_file, 'w')
-    #     # txt_file.write(text)
-    #     # pdf_file.close()
-    #     # txt_file.close()
-    #     # os.remove(file_path)
+    # def extract_text_from_pdf(self,file,learn_dir):
+    #     try:
+    #         return True
+    #         file = self.convert_to_tiff(str(file))
+    #         txt_file = learn_dir/os.path.basename(file).split('/')[-1].lower().replace('tiff','txt')
+    #         if os.path.isfile(file) and file.endswith(".tiff"):
+    #             text= pytesseract.image_to_string(Image.open(file), lang="heb+eng")
+    #             with open(txt_file, "w") as txt_file:
+    #                 txt_file.write(text)
+    #             os.remove(file)
                 
+    #     except Exception as e:
+    #         logger.error(str(e))            
+
+
+
+
+    # def convert_to_tiff(self,image_file):
+    #     logger.info("Converting pdf to tiff")
+    #     converted_file_name = image_file.replace('pdf','tiff')
+    #     p = subprocess.Popen('convert -density 300 '+ image_file +' -background white -alpha Off '+ converted_file_name , stderr=subprocess.STDOUT, shell=True)
+    #     p_status = p.wait()
+    #     time.sleep(5)
+    #     if os.path.exists(image_file):
+    #         os.remove(image_file)
+    #     return converted_file_name
