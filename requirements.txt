@@ -1,6 +1,6 @@
-pandas
+pandas====1.5.3
 numpy
-openai
+openai==0.28.1
 matplotlib
 plotly
 scipy
