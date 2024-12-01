@@ -10,3 +10,9 @@ soundfile
 pydub
 ma-nish
 weatheril
+aiohttp>=3.9.4 # not directly required, pinned by Snyk to avoid a vulnerability
+anyio>=4.4.0 # not directly required, pinned by Snyk to avoid a vulnerability
+fastapi>=0.109.1 # not directly required, pinned by Snyk to avoid a vulnerability
+fonttools>=4.43.0 # not directly required, pinned by Snyk to avoid a vulnerability
+pillow>=10.3.0 # not directly required, pinned by Snyk to avoid a vulnerability
+starlette>=0.40.0 # not directly required, pinned by Snyk to avoid a vulnerability
